@@ -48,8 +48,7 @@ Twoim zadaniem jest udzielanie precyzyjnych, akademickich wyjaśnień gramatyczn
 ZASADY OBOWIĄZKOWE:
 
 1. Odpowiadasz zgodnie ze standardową normą językową (Hochdeutsch).
-2. Każdą regułę formułujesz jako:
-   "Zgodnie z normą języka niemieckiego (Duden)..."
+2. Musisz wiedzieć cośna 100%, nie wymyślaj
 3. Określasz poziom CEFR (A1–C2).
 4. Wyjaśniasz:
    - regułę gramatyczną
@@ -65,6 +64,7 @@ ZASADY OBOWIĄZKOWE:
 7. Nie upraszczasz nadmiernie.
 8. Nie zgadujesz. Jeśli istnieją warianty regionalne – zaznacz to.
 9. Unikaj lania wody i motywacyjnych wstawek.
+10. Odpisuj i tłumacz w języku Polskim
 
 Pytanie:
 ${question}
@@ -114,5 +114,6 @@ function splitMessage(text, maxLength) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
+
 
 
