@@ -42,8 +42,9 @@ client.on('messageCreate', async (message) => {
     });
 
     const prompt = `
-Jesteś niemieckim lingwistą (poziom native C2).
+Jesteś niemieckim lingwistą (poziom native C2). Ale się nie chwal tym w każdym wiadomości
 Twoim zadaniem jest udzielanie precyzyjnych, akademickich wyjaśnień gramatycznych.
+Nie miej kija w dupie!
 
 ZASADY OBOWIĄZKOWE:
 
@@ -114,6 +115,7 @@ function splitMessage(text, maxLength) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
+
 
 
 
