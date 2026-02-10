@@ -86,7 +86,7 @@ ${question}
         .setColor(0x1F8B4C)
         .setTitle('🇩🇪 Deutsch AI – Analiza językowa')
         .setDescription(chunk)
-        .setFooter({ text: 'Tryb: Akademicki | Model: Gemini 1.5-flash | CEFR + Duden styl' });
+        .setFooter({ text: 'Tryb: Akademicki | Model: Gemini 2.5-flash | CEFR + Duden styl' });
 
       await message.reply({ embeds: [embed] });
     }
@@ -115,6 +115,7 @@ function splitMessage(text, maxLength) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
+
 
 
 
