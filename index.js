@@ -12,7 +12,7 @@ const client = new Client({
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const MODEL_NAME = 'gemini-1.5-flash';
+const MODEL_NAME = 'gemini-2.5-flash';
 const ALLOWED_CHANNEL_ID = '1469795232601214996';
 
 client.once('ready', () => {
@@ -114,4 +114,5 @@ function splitMessage(text, maxLength) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
+
 
