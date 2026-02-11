@@ -15,6 +15,9 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const MODEL_NAME = 'gemini-2.5-flash';
 const ALLOWED_CHANNEL_ID = '1469795232601214996';
 
+// 🧠 Pamięć rozmów (per użytkownik)
+const conversations = new Map();
+
 client.once('ready', () => {
   console.log(`✅ Zalogowano jako ${client.user.tag}`);
 });
@@ -41,26 +44,52 @@ client.on('messageCreate', async (message) => {
       },
     });
 
-    const prompt = `
+    // 🧠 Pobierz lub stwórz historię użytkownika
+    const userId = message.author.id;
+
+    if (!conversations.has(userId)) {
+      conversations.set(userId, []);
+    }
+
+    const history = conversations.get(userId);
+
+    // 📌 System prompt jako pierwsza wiadomość (jeśli nowa rozmowa)
+    if (history.length === 0) {
+      history.push({
+        role: "user",
+        parts: [{
+          text: `
 Jesteś niemieckim lingwistą (native C2).
 Odpowiadasz zwięźle, precyzyjnie i w języku polskim. Nie masz kija w dupie i piszesz w miarę luźno ale z szacunkiem do osoby zadającej Ci pytanie.
-Każdą Odpowiedź zaczynaj od przywitania "Cześć", "Witaj", lub innej podobnej formułki.
-
-
+Każdą odpowiedź zaczynaj od przywitania "Cześć", "Witaj", lub podobnego.
 
 Nie rozpisuj się.
 Nie filozofuj.
 Nie urywaj zdań.
 Kończ pełną myślą.
-Zawsze zakończ odpowiedź pełnym zdaniem. 
-Nie urywaj wypowiedzi w połowie. 
+Zawsze zakończ odpowiedź pełnym zdaniem.
 Jeśli zbliżasz się do limitu, skróć mniej istotne części, ale zakończ logicznie.
+`
+        }]
+      });
+    }
 
-Pytanie:
-${question}
-`;
+    // ➕ Dodaj nowe pytanie do historii
+    history.push({
+      role: "user",
+      parts: [{ text: question }]
+    });
 
-    const result = await model.generateContent(prompt);
+    // 🔒 Limit historii (ostatnie 10 wiadomości)
+    if (history.length > 10) {
+      history.splice(1, history.length - 10);
+    }
+
+    // 🚀 Wysyłamy CAŁĄ historię do Gemini
+    const result = await model.generateContent({
+      contents: history,
+    });
+
     const response = await result.response;
     let reply = response.text();
 
@@ -68,12 +97,17 @@ ${question}
       return message.reply('❌ Nie udało się wygenerować odpowiedzi.');
     }
 
-    // 🔒 Zabezpieczenie przed urwaniem w połowie słowa
+    // ➕ Zapisz odpowiedź modelu do historii
+    history.push({
+      role: "model",
+      parts: [{ text: reply }]
+    });
+
+    // 🔒 Zabezpieczenie przed urwaniem
     reply = safeTrim(reply, 3900);
 
-    // 🎨 Minimalistyczny premium embed
     const embed = new EmbedBuilder()
-      .setColor('#1D3557') 
+      .setColor('#1D3557')
       .setAuthor({
         name: 'Deutsch AI – Lingwistyczna analiza',
         iconURL: client.user.displayAvatarURL(),
@@ -103,13 +137,11 @@ function safeTrim(text, maxLength) {
 
   let trimmed = text.slice(0, maxLength);
 
-  // spróbuj zakończyć na ostatniej kropce
   const lastDot = trimmed.lastIndexOf('.');
   if (lastDot > maxLength * 0.7) {
     return trimmed.slice(0, lastDot + 1);
   }
 
-  // jeśli nie ma kropki – zakończ na ostatniej spacji
   const lastSpace = trimmed.lastIndexOf(' ');
   if (lastSpace > -1) {
     return trimmed.slice(0, lastSpace) + '...';
@@ -119,5 +151,3 @@ function safeTrim(text, maxLength) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
-
-
