@@ -16,7 +16,7 @@ const MODEL_NAME = 'gemini-2.5-flash';
 const ALLOWED_CHANNEL_ID = '1469795232601214996';
 
 client.once('ready', () => {
-  console.log(`Zalogowano jako ${client.user.tag}`);
+  console.log(`✅ Zalogowano jako ${client.user.tag}`);
 });
 
 client.on('messageCreate', async (message) => {
@@ -42,30 +42,23 @@ client.on('messageCreate', async (message) => {
     });
 
     const prompt = `
-Jesteś niemieckim lingwistą (poziom native C2). Ale się nie chwal tym w każdym wiadomości
-Twoim zadaniem jest udzielanie precyzyjnych, akademickich wyjaśnień gramatycznych.
-Nie miej kija w dupie!
+Jesteś niemieckim lingwistą (native C2).
+Odpowiadasz zwięźle, precyzyjnie, akademicko i w języku polskim.
 
-ZASADY OBOWIĄZKOWE:
+STRUKTURA OBOWIĄZKOWA:
 
-1. Odpowiadasz zgodnie ze standardową normą językową (Hochdeutsch).
-2. Musisz wiedzieć cośna 100%, nie wymyślaj
-3. Określasz poziom CEFR (A1–C2).
-4. Wyjaśniasz:
-   - regułę gramatyczną
-   - rekcję (jeśli dotyczy)
-   - przypadek (Kasus)
-   - strukturę zdania (Satzstruktur)
-5. Podajesz:
-   - 3 poprawne przykłady
-   - 1 kontrprzykład (błędny) z wyjaśnieniem
-6. Rozróżniasz:
-   - Sprache formell
-   - Umgangssprache (jeśli występuje różnica)
-7. Nie upraszczasz nadmiernie.
-8. Nie zgadujesz. Jeśli istnieją warianty regionalne – zaznacz to.
-9. Unikaj lania wody i motywacyjnych wstawek.
-10. Odpisuj i tłumacz w języku Polskim
+1. REGUŁA (zgodnie z normą językową – Duden)
+2. Krótkie wyjaśnienie
+3. Analiza (Kasus / Rektion / Satzbau – jeśli istotne)
+4. 2–3 poprawne przykłady
+5. Rejestr (formalny / potoczny – jeśli dotyczy)
+6. Poziom CEFR
+7. Krótkie podsumowanie (1–2 zdania)
+
+Nie rozpisuj się.
+Nie filozofuj.
+Nie urywaj zdań.
+Kończ pełną myślą.
 
 Pytanie:
 ${question}
@@ -75,21 +68,28 @@ ${question}
     const response = await result.response;
     let reply = response.text();
 
-    if (!reply) {
-      return message.reply('Nie udało się wygenerować odpowiedzi.');
+    if (!reply || reply.length < 5) {
+      return message.reply('❌ Nie udało się wygenerować odpowiedzi.');
     }
 
-    const chunks = splitMessage(reply, 4000);
+    // 🔒 Zabezpieczenie przed urwaniem w połowie słowa
+    reply = safeTrim(reply, 3900);
 
-    for (const chunk of chunks) {
-      const embed = new EmbedBuilder()
-        .setColor(0x1F8B4C)
-        .setTitle('🇩🇪 Deutsch AI – Analiza językowa')
-        .setDescription(chunk)
-        .setFooter({ text: 'Tryb: Akademicki | Model: Gemini 2.5-flash | CEFR + Duden styl' });
+    // 🎨 Minimalistyczny premium embed
+    const embed = new EmbedBuilder()
+      .setColor('#1D3557') 
+      .setAuthor({
+        name: 'Deutsch AI – Lingwistyczna analiza',
+        iconURL: client.user.displayAvatarURL(),
+      })
+      .setDescription(reply)
+      .setTimestamp()
+      .setFooter({
+        text: `Zapytanie od ${message.author.username} • Gemini 2.5 Flash`,
+        iconURL: message.author.displayAvatarURL(),
+      });
 
-      await message.reply({ embeds: [embed] });
-    }
+    await message.reply({ embeds: [embed] });
 
   } catch (error) {
     console.error(error);
@@ -97,26 +97,29 @@ ${question}
   }
 });
 
-function splitMessage(text, maxLength) {
-  const paragraphs = text.split('\n');
-  const chunks = [];
-  let current = '';
+/**
+ * Bezpieczne przycinanie tekstu:
+ * - nie ucina w połowie słowa
+ * - próbuje zakończyć na kropce
+ */
+function safeTrim(text, maxLength) {
+  if (text.length <= maxLength) return text;
 
-  for (const paragraph of paragraphs) {
-    if ((current + paragraph).length > maxLength) {
-      chunks.push(current);
-      current = '';
-    }
-    current += paragraph + '\n';
+  let trimmed = text.slice(0, maxLength);
+
+  // spróbuj zakończyć na ostatniej kropce
+  const lastDot = trimmed.lastIndexOf('.');
+  if (lastDot > maxLength * 0.7) {
+    return trimmed.slice(0, lastDot + 1);
   }
 
-  if (current) chunks.push(current);
-  return chunks;
+  // jeśli nie ma kropki – zakończ na ostatniej spacji
+  const lastSpace = trimmed.lastIndexOf(' ');
+  if (lastSpace > -1) {
+    return trimmed.slice(0, lastSpace) + '...';
+  }
+
+  return trimmed + '...';
 }
 
 client.login(process.env.DISCORD_TOKEN);
-
-
-
-
-
