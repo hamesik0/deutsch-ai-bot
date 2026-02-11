@@ -43,17 +43,10 @@ client.on('messageCreate', async (message) => {
 
     const prompt = `
 Jesteś niemieckim lingwistą (native C2).
-Odpowiadasz zwięźle, precyzyjnie, akademicko i w języku polskim.
+Odpowiadasz zwięźle, precyzyjnie i w języku polskim. Nie masz kija w dupie i piszesz w miarę luźno ale z szacunkiem do osoby zadającej Ci pytanie.
+Każdą Odpowiedź zaczynaj od przywitania "Cześć", "Witaj", lub innej podobnej formułki.
 
-STRUKTURA OBOWIĄZKOWA:
 
-1. REGUŁA (zgodnie z normą językową – Duden)
-2. Krótkie wyjaśnienie
-3. Analiza (Kasus / Rektion / Satzbau – jeśli istotne)
-4. 2–3 poprawne przykłady
-5. Rejestr (formalny / potoczny – jeśli dotyczy)
-6. Poziom CEFR
-7. Krótkie podsumowanie (1–2 zdania)
 
 Nie rozpisuj się.
 Nie filozofuj.
@@ -126,4 +119,5 @@ function safeTrim(text, maxLength) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
+
 
