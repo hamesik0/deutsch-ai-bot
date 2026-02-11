@@ -109,7 +109,7 @@ Jeśli zbliżasz się do limitu, skróć mniej istotne części, ale zakończ lo
     const embed = new EmbedBuilder()
       .setColor('#1D3557')
       .setAuthor({
-        name: 'Deutsch AI – Lingwistyczna analiza',
+        name: 'Deutsch AI',
         iconURL: client.user.displayAvatarURL(),
       })
       .setDescription(reply)
@@ -151,3 +151,4 @@ function safeTrim(text, maxLength) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
+
