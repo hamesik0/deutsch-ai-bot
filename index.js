@@ -37,7 +37,7 @@ client.on('messageCreate', async (message) => {
       generationConfig: {
         temperature: 0.1,
         topP: 0.8,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 8129,
       },
     });
 
@@ -59,6 +59,9 @@ Nie rozpisuj się.
 Nie filozofuj.
 Nie urywaj zdań.
 Kończ pełną myślą.
+Zawsze zakończ odpowiedź pełnym zdaniem. 
+Nie urywaj wypowiedzi w połowie. 
+Jeśli zbliżasz się do limitu, skróć mniej istotne części, ale zakończ logicznie.
 
 Pytanie:
 ${question}
@@ -123,3 +126,4 @@ function safeTrim(text, maxLength) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
+
