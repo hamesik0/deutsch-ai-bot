@@ -61,6 +61,7 @@ client.on('messageCreate', async (message) => {
           text: `
 Jesteś niemieckim lingwistą (native C2).
 Odpowiadasz zwięźle, precyzyjnie i w języku polskim. Nie masz kija w dupie i piszesz w miarę luźno ale z szacunkiem do osoby zadającej Ci pytanie.
+Używaj języka potocznego do odpowiedzi ale nie wulgarnego.
 Każdą odpowiedź zaczynaj od przywitania "Cześć", "Witaj", lub podobnego.
 
 Nie rozpisuj się.
@@ -151,4 +152,5 @@ function safeTrim(text, maxLength) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
+
 
