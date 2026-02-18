@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { Client, GatewayIntentBits, EmbedBuilder } from 'discord.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { SISTER_STYLE } from './generatedStyle.js'; // ✅ NOWY IMPORT
 
 const client = new Client({
   intents: [
@@ -44,7 +45,6 @@ client.on('messageCreate', async (message) => {
       },
     });
 
-    // 🧠 Pobierz lub stwórz historię użytkownika
     const userId = message.author.id;
 
     if (!conversations.has(userId)) {
@@ -59,11 +59,13 @@ client.on('messageCreate', async (message) => {
         role: "user",
         parts: [{
           text: `
+${SISTER_STYLE}
+
 Jesteś niemieckim lingwistą (native C2).
 Odpowiadasz zwięźle, precyzyjnie i w języku polskim. Nie masz kija w dupie i piszesz w miarę luźno ale z szacunkiem do osoby zadającej Ci pytanie.
 Używaj języka potocznego do odpowiedzi ale nie wulgarnego.
 Nie nadużywaj językoznawczej papki, nie używaj językoznawczych pojęć wykraczających poza poziom podstawowy jak przypadek, czasownik itp.
-"an" po niemiecku znaczy "przy", a nie "na" !!!!! Cały czas popełniasz ten błąd!!!!!!
+"an" po niemiecku znaczy "przy", a nie "na".
 Każdą odpowiedź zaczynaj od przywitania "Cześć", "Witaj", lub podobnego.
 
 Nie rozpisuj się.
@@ -77,18 +79,15 @@ Jeśli zbliżasz się do limitu, skróć mniej istotne części, ale zakończ lo
       });
     }
 
-    // ➕ Dodaj nowe pytanie do historii
     history.push({
       role: "user",
       parts: [{ text: question }]
     });
 
-    // 🔒 Limit historii (ostatnie 10 wiadomości)
     if (history.length > 10) {
       history.splice(1, history.length - 10);
     }
 
-    // 🚀 Wysyłamy CAŁĄ historię do Gemini
     const result = await model.generateContent({
       contents: history,
     });
@@ -100,13 +99,11 @@ Jeśli zbliżasz się do limitu, skróć mniej istotne części, ale zakończ lo
       return message.reply('❌ Nie udało się wygenerować odpowiedzi.');
     }
 
-    // ➕ Zapisz odpowiedź modelu do historii
     history.push({
       role: "model",
       parts: [{ text: reply }]
     });
 
-    // 🔒 Zabezpieczenie przed urwaniem
     reply = safeTrim(reply, 3900);
 
     const embed = new EmbedBuilder()
@@ -130,11 +127,6 @@ Jeśli zbliżasz się do limitu, skróć mniej istotne części, ale zakończ lo
   }
 });
 
-/**
- * Bezpieczne przycinanie tekstu:
- * - nie ucina w połowie słowa
- * - próbuje zakończyć na kropce
- */
 function safeTrim(text, maxLength) {
   if (text.length <= maxLength) return text;
 
@@ -154,6 +146,3 @@ function safeTrim(text, maxLength) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
-
-
-
