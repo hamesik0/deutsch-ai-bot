@@ -112,7 +112,7 @@ Jeśli zbliżasz się do limitu, skróć mniej istotne części, ale zakończ lo
     const embed = new EmbedBuilder()
       .setColor('#1D3557')
       .setAuthor({
-        name: 'Deutsch AI',
+        name: 'Ziutek',
         iconURL: client.user.displayAvatarURL(),
       })
       .setDescription(reply)
