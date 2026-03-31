@@ -1,5 +1,5 @@
 {
-  "name": "deutsch-ai-bot",
+  "name": "ziutek",
   "type": "module",
   "scripts": {
     "start": "node index.js"
