@@ -13,7 +13,9 @@ const client = new Client({
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const MODEL_NAME = 'gemini-2.5-flash';
-const ALLOWED_CHANNEL_ID = '1469795232601214996';
+
+// 🟢 Kanał gdzie bot działa bez komendy
+const AUTO_CHANNEL_ID = '1486757389247053974';
 
 // 🧠 Pamięć rozmów (per użytkownik)
 const conversations = new Map();
@@ -24,13 +26,21 @@ client.once('ready', () => {
 
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
-  if (message.channel.id !== ALLOWED_CHANNEL_ID) return;
-  if (!message.content.startsWith('!ai')) return;
 
-  const question = message.content.replace('!ai', '').trim();
-  if (!question) {
-    return message.reply('Podaj pytanie po komendzie !ai');
+  let question;
+
+  // 🟢 Tryb: kanał specjalny (bez !ai)
+  if (message.channel.id === AUTO_CHANNEL_ID) {
+    question = message.content.trim();
   }
+
+  // 🔵 Tryb: reszta serwera (tylko !ai)
+  else {
+    if (!message.content.startsWith('!ai')) return;
+    question = message.content.replace('!ai', '').trim();
+  }
+
+  if (!question || question.length < 3) return;
 
   try {
     await message.channel.sendTyping();
@@ -44,7 +54,6 @@ client.on('messageCreate', async (message) => {
       },
     });
 
-    // 🧠 Pobierz lub stwórz historię użytkownika
     const userId = message.author.id;
 
     if (!conversations.has(userId)) {
@@ -53,13 +62,14 @@ client.on('messageCreate', async (message) => {
 
     const history = conversations.get(userId);
 
-    // 📌 System prompt jako pierwsza wiadomość (jeśli nowa rozmowa)
+    // 📌 System prompt
     if (history.length === 0) {
       history.push({
         role: "user",
         parts: [{
           text: `
-Jesteś niemieckim lingwistą (native C2).
+Jesteś niemieckim lingwistą (native C2) ale też nauczycielem i mentorem.
+Jesteś wyrozumiały.
 Odpowiadasz zwięźle, precyzyjnie i w języku polskim.
 Piszesz luźno, ale z szacunkiem.
 Używaj języka potocznego, ale nie wulgarnego.
@@ -78,13 +88,11 @@ Jeśli zbliżasz się do limitu, skróć mniej istotne części, ale zakończ lo
       });
     }
 
-    // ➕ Dodaj nowe pytanie
     history.push({
       role: "user",
       parts: [{ text: question }]
     });
 
-    // 🔒 Limit historii (max 10 elementów)
     if (history.length > 10) {
       history.splice(1, history.length - 10);
     }
@@ -100,13 +108,11 @@ Jeśli zbliżasz się do limitu, skróć mniej istotne części, ale zakończ lo
       return message.reply('❌ Nie udało się wygenerować odpowiedzi.');
     }
 
-    // ➕ Zapisz odpowiedź do historii
     history.push({
       role: "model",
       parts: [{ text: reply }]
     });
 
-    // 🔒 Zabezpieczenie przed urwaniem
     reply = safeTrim(reply, 3900);
 
     const embed = new EmbedBuilder()
