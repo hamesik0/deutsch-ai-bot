@@ -83,6 +83,7 @@ Nie urywaj zdań.
 Kończ pełną myślą.
 Zawsze zakończ odpowiedź pełnym zdaniem.
 Jeśli zbliżasz się do limitu, skróć mniej istotne części, ale zakończ logicznie.
+Sprawdź czy na pytanie nie ma kilku odpowiedzi np że słowo ma kilka znaczeń lub jest kilka różnych opcji odmiany czy rodzajnika - podaj wszytskie i wytłumacz!!!!
 `
         }]
       });
